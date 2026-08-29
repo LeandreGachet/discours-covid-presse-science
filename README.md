@@ -26,9 +26,11 @@ Une méthode pour comparer deux discours sur un même sujet sans les lire : deux
 
 | | |
 |---|---|
+| `code/analyse_covid.ipynb` | le notebook complet — 24 cellules exécutées |
+| `code/notes_de_travail.txt` | les notes de travail et les jeux de données visés |
 | `presentation.pptx` | la présentation du projet |
 
-*Le code de ce projet ne figure pas dans l'archive dont provient ce dépôt ; seule la restitution a été conservée.*
+
 
 ## Sources
 
@@ -41,3 +43,11 @@ Projet réalisé avec Nominoë Thomas et Gaspard Ichas. Publié avec leur accord
 ---
 
 **Léandre Gachet** — Master Mathématiques appliquées, statistique, Université de Rennes
+
+## Reproduire
+
+```bash
+pip install kagglehub pandas numpy nltk sentence-transformers scikit-learn matplotlib
+```
+
+Les corpus sont téléchargés par `kagglehub` depuis le notebook (une authentification Kaggle est nécessaire). Le lexique VADER se récupère via `nltk.download`.

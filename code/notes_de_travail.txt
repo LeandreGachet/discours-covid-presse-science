@@ -1,0 +1,83 @@
+﻿Projet NLP covid
+
+
+TF-IDF
+Analyse de sentiment
+
+
+ressource -> https://github.com/sylbarth/m2-nlp/tree/main
+
+
+code pour TF-IDF -> https://github.com/sylbarth/m2-nlp/blob/main/notebooks/nlp-2-stockdata.ipynb
+
+
+import kagglehub
+
+
+# Téléchargement du dataset d'articles de presse COVID
+print("Téléchargement du dataset COVID news articles...")
+path_covid_news = kagglehub.dataset_download("timmayer/covid-news-articles-2020-2022")
+print("Path to COVID news dataset:", path_covid_news)
+
+
+# Téléchargement du dataset CORD-19
+print("\nTéléchargement du dataset CORD-19...")
+path_cord19 = kagglehub.dataset_download("allen-institute-for-ai/CORD-19-research-challenge")
+print("Path to CORD-19 dataset:", path_cord19)
+path_publications = kagglehub.dataset_download("draaslan/covid19-research-papers-dataset")
+
+
+print("Path to dataset files:", path_publications)
+
+
+
+
+
+
+
+
+
+
+import re
+def nettoyer_texte(s):
+    s = str(s)
+    s = re.sub(r'<.*?>', '', s)  # supprimer balises
+    s = re.sub(r'\s+', ' ', s)   # réduire espaces multiples à 1
+    s = re.sub(r'\n\s*\n\s*\n+', '\n\n', s)  # Réduire les sauts de ligne multiples
+    s = re.sub(r'[ \t]+', ' ', s)  # Espaces multiples en un seul
+    s = re.sub(r' +\n', '\n', s)  # Espaces en fin de ligne
+    s = re.sub(r'\n +', '\n', s)  # Espaces en début de ligne
+
+
+    # 9. Supprimer les parenthèses vides ou avec juste des espaces
+    s = re.sub(r'\(\s*\)', '', s)
+
+
+    # 10. Nettoyer la ponctuation défectueuse
+    s = re.sub(r'\.+', '.', s)  # Points multiples
+    s = re.sub(r',+', ',', s)  # Virgules multiples
+    s = re.sub(r'\s+([,.;:!?])', r'\1', s)  # Espaces avant ponctuation
+    return s.strip()              # enlever espaces début/fin
+
+
+df_research['texte_nettoye'] = df_research['abstract'].apply(nettoyer_texte)
+df_research['texte_nettoye'] = df_research['texte_nettoye'].str.split('Copyright').str[0].str.strip()
+
+
+
+
+Prétraitement : nettoyer texte, extraire date (article), normaliser (anglais/français).
+
+Embeddings :
+
+* Sci articles → embeddings SPECTER2 (ou sentence-transformers/allenai-specter). Hugging Face+1
+
+* CBC news → embeddings all-MiniLM-L6-v2. Hugging Face
+
+Agrégation temporelle : grouper par mois/trimestre, calculer embedding moyen (ou centroid) par période et par source.
+
+Comparaison : distance/cosine-similarity entre centroid CBC vs centroid Scientifique par période → trajectoire temporelle de la similarité (voir virage thématique).
+
+Option sentiment / stance : si tu veux un score émotionnel/stance, fine-tune un classifieur sur labels (ou utiliser CT-BERT pour contenu COVID).
+
+Visualisation : séries temporelles (similarité), clustering dynamique, topic modelling sur périodes (BERTopic sur embeddings).
